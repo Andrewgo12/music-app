@@ -1,0 +1,135 @@
+name: 🚀 Deploy Spotify Enhanced to Production
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  NODE_VERSION: '18'
+  CACHE_DEPENDENCY_PATH: package-lock.json
+
+jobs:
+  # Build and Test Job
+  build-and-test:
+    name: 🔨 Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: ${{ env.CACHE_DEPENDENCY_PATH }}
+
+    - name: 📦 Install dependencies
+      run: |
+        npm ci --prefer-offline --no-audit
+
+    - name: 🔍 Run ESLint
+      run: npm run lint
+      continue-on-error: false
+
+    - name: 🏗️ Build application
+      run: |
+        npm run build
+        ls -la dist/
+      env:
+        NODE_ENV: production
+
+    - name: 🧪 Test build output
+      run: |
+        # Check if critical files exist
+        test -f dist/index.html || exit 1
+        test -d dist/assets || exit 1
+        echo "✅ Build output verified"
+
+    - name: 📤 Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: spotify-enhanced-dist
+        path: dist/
+        retention-days: 30
+        if-no-files-found: error
+
+  # Deploy to Vercel Job
+  deploy-vercel:
+    name: 🚀 Deploy to Vercel
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 📥 Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: spotify-enhanced-dist
+        path: dist/
+
+    - name: 🚀 Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: '--prod'
+        working-directory: ./
+
+  # Deploy to Netlify Job (Alternative)
+  deploy-netlify:
+    name: 🌐 Deploy to Netlify
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && false # Disabled by default
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 📥 Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: spotify-enhanced-dist
+        path: dist/
+
+    - name: 🌐 Deploy to Netlify
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        publish-dir: './dist'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "🎵 Deploy Spotify Enhanced v${{ github.sha }}"
+        enable-pull-request-comment: true
+        enable-commit-comment: true
+        overwrites-pull-request-comment: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  # Lighthouse Performance Audit
+  lighthouse:
+    name: 🔍 Lighthouse Audit
+    needs: deploy-vercel
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔍 Run Lighthouse CI
+      uses: treosh/lighthouse-ci-action@v10
+      with:
+        configPath: './.lighthouserc.json'
+        uploadArtifacts: true
+        temporaryPublicStorage: true

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "artist-1",
+    "name": "The Weeknd",
+    "genre": "Pop",
+    "imageUrl": "/images/the-weeknd.jpg",
+    "bio": "Canadian singer, songwriter, and record producer known for his dark, atmospheric music.",
+    "followers": 85000000,
+    "verified": true,
+    "albums": ["After Hours", "Dawn FM", "Beauty Behind the Madness"],
+    "topSongs": ["1"]
+  },
+  {
+    "id": "artist-2",
+    "name": "Ed Sheeran",
+    "genre": "Pop",
+    "imageUrl": "/images/ed-sheeran.jpg",
+    "bio": "English singer-songwriter known for his acoustic guitar-driven pop songs.",
+    "followers": 47000000,
+    "verified": true,
+    "albums": ["÷ (Divide)", "× (Multiply)", "+ (Plus)"],
+    "topSongs": ["2"]
+  },
+  {
+    "id": "artist-3",
+    "name": "Billie Eilish",
+    "genre": "Alternative",
+    "imageUrl": "/images/billie-eilish.jpg",
+    "bio": "American singer-songwriter known for her unique style and haunting vocals.",
+    "followers": 42000000,
+    "verified": true,
+    "albums": ["When We All Fall Asleep, Where Do We Go?", "Happier Than Ever"],
+    "topSongs": ["3"]
+  },
+  {
+    "id": "artist-4",
+    "name": "Harry Styles",
+    "genre": "Pop Rock",
+    "imageUrl": "/images/harry-styles.jpg",
+    "bio": "English singer, songwriter, and actor, former member of One Direction.",
+    "followers": 38000000,
+    "verified": true,
+    "albums": ["Fine Line", "Harry Styles", "Harry's House"],
+    "topSongs": ["4"]
+  },
+  {
+    "id": "artist-5",
+    "name": "Dua Lipa",
+    "genre": "Dance Pop",
+    "imageUrl": "/images/dua-lipa.jpg",
+    "bio": "English singer and songwriter known for her disco-influenced pop music.",
+    "followers": 35000000,
+    "verified": true,
+    "albums": ["Future Nostalgia", "Dua Lipa"],
+    "topSongs": ["5"]
+  }
+]
